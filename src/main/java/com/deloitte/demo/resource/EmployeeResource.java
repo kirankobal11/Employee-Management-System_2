@@ -1,45 +1,51 @@
-// EmployeeResource.java 
-
 package com.deloitte.demo.resource;
-
-import java.util.List;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import com.deloitte.demo.model.Employee;
 import com.deloitte.demo.service.EmployeeService;
 
+import javax.inject.Inject;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.List;
+
 @Path("/employees")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class EmployeeResource {
 
-	private EmployeeService empService =  new EmployeeService();
-//	private EmployeeService empService =  EmployeeService.getInstance();
-	
+    @Inject
+    private EmployeeService employeeService;
 
-	@GET
-	@Produces(MediaType.APPLICATION_JSON)
-	public List<Employee> getAllEmployees() {
-		return empService.getAllEmployees();
-	}
+    @GET
+    public List<Employee> getAllEmployees() {
+        return employeeService.getAllEmployees();
+    }
 
-	@POST
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response addEmployee(Employee employee) {
-		Employee emp = empService.addEmployee(employee);
-		return Response.status(Response.Status.CREATED).entity(emp).header("messsage", "employee added successfully!")
-				.build();
-	}
+    @GET
+    @Path("/{id}")
+    public Employee getEmployeeById(@PathParam("id") int id) {
+        return employeeService.getEmployeeById(id);
+    }
 
-//	implement these methods - 
-//	getEmployeeById
-//	updateEmployee 
-//	deleteEmployee 
+    @POST
+    public Response createEmployee(Employee employee) {
+        employeeService.createEmployee(employee);
+        return Response.status(Response.Status.CREATED).build();
+    }
 
+    @PUT
+    @Path("/{id}")
+    public Response updateEmployee(@PathParam("id") int id, Employee employee) {
+        employee.setId(id);
+        employeeService.updateEmployee(employee);
+        return Response.ok().build();
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public Response deleteEmployee(@PathParam("id") int id) {
+        employeeService.deleteEmployee(id);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
 }
